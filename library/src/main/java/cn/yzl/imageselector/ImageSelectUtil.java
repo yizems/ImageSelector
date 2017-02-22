@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
@@ -187,10 +186,10 @@ public class ImageSelectUtil {
     }
 
     private boolean canCrop() {
-        if (!config.isCanCrop()) {
+        if (!config.getCrop()) {
             config.getCallBack().sucess(tempPath);
         }
-        return config.isCanCrop();
+        return config.getCrop();
     }
 
     public void onResult(int requestCode, int resultCode, Intent data) {
@@ -281,7 +280,7 @@ public class ImageSelectUtil {
             return this;
         }
 
-        public Build setCanCrop(boolean canCrop) {
+        public Build setCrop(boolean canCrop) {
             this.canCrop = canCrop;
             return this;
         }

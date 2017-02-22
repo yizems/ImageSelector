@@ -8,13 +8,13 @@ import android.content.Context;
 
 public class SelectConfig {
     private String rootDir;
-    private boolean canCrop;
+    private boolean crop;
     private Object object;
 
 
-    public SelectConfig(String rootDir, boolean canCrop, Object object, ImageSelectCallBack callBack) {
+    public SelectConfig(String rootDir, boolean crop, Object object, ImageSelectCallBack callBack) {
         this.rootDir = rootDir;
-        this.canCrop = canCrop;
+        this.crop = crop;
         this.object = object;
         this.callBack = callBack;
     }
@@ -46,14 +46,12 @@ public class SelectConfig {
         this.rootDir = rootDir;
     }
 
-    public boolean isCanCrop() {
-        return canCrop;
+
+    public boolean getCrop() {
+        return crop;
     }
 
-    public void setCanCrop(boolean canCrop) {
-        this.canCrop = canCrop;
+    public void setCrop(boolean crop) {
+        this.crop = crop;
     }
-
-
-
 }
