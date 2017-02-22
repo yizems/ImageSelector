@@ -12,11 +12,14 @@ import java.util.UUID;
 
 public class FileStorage {
 
-    public static final String rootDir = Environment.getExternalStorageDirectory() + "/" + "ImgSelector";
+    public static final String rootDir = Environment.getExternalStorageDirectory() + "/";
 
-    public FileStorage() {
+    private String rootDirName;
+
+    public FileStorage(String rootDirName) {
+        this.rootDirName = rootDirName;
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            File rootDirFile = new File(rootDir);
+            File rootDirFile = new File(rootDir + rootDirName);
             if (!rootDirFile.exists()) {
                 rootDirFile.mkdirs();
             }
@@ -28,11 +31,11 @@ public class FileStorage {
         if (rootDir != null) {
             fileName = UUID.randomUUID().toString() + ".png";
         }
-        return new File(rootDir, fileName);
+        return new File(rootDir + rootDirName, fileName);
     }
 
-    public static void clearFile() {
-        deleteFolderFile(rootDir, true);
+    public void clearFile() {
+        deleteFolderFile(rootDir + rootDirName, true);
     }
 
     /**

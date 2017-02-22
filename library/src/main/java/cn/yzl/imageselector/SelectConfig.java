@@ -1,5 +1,7 @@
 package cn.yzl.imageselector;
 
+import android.content.Context;
+
 /**
  * Created by YZL on 2017/2/22.
  */
@@ -9,7 +11,6 @@ public class SelectConfig {
     private boolean canCrop;
     private Object object;
 
-    private ImageSelectCallBack callBack;
 
     public SelectConfig(String rootDir, boolean canCrop, Object object, ImageSelectCallBack callBack) {
         this.rootDir = rootDir;
@@ -17,6 +18,9 @@ public class SelectConfig {
         this.object = object;
         this.callBack = callBack;
     }
+
+    private ImageSelectCallBack callBack;
+
 
     public ImageSelectCallBack getCallBack() {
         return callBack;

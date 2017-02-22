@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
@@ -22,6 +23,7 @@ import java.io.File;
  */
 public class ImageSelectUtil {
 
+    private FileStorage fileStorage;
     SelectConfig config;
 
     /**
@@ -47,15 +49,15 @@ public class ImageSelectUtil {
 
     protected ImageSelectUtil(SelectConfig config) {
         this.config = config;
+        fileStorage = new FileStorage(config.getRootDir());
     }
 
     public void openCaram() {
-        targetPath = null;
-        File file = new FileStorage().createFile();
+        File file = fileStorage.createFile();
         tempPath = file.getAbsolutePath();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             //通过FileProvider创建一个content类型的Uri
-            tempUri = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID + ".fileprovider", file);
+            tempUri = FileProvider.getUriForFile(getContext(), "cn.yzl.imageselector.fileprovider", file);
         } else {
             tempUri = Uri.fromFile(file);
         }
@@ -155,7 +157,7 @@ public class ImageSelectUtil {
             return;
         }
 
-        File file = new FileStorage().createFile();
+        File file = fileStorage.createFile();
         targetPath = file.getAbsolutePath();
         Uri outputUri = null;
 
@@ -247,6 +249,7 @@ public class ImageSelectUtil {
         private boolean canCrop;
         private Object object;
         private ImageSelectCallBack callBack;
+
 
         private static final ImageSelectCallBack DEFAULT_CALLBACK = new ImageSelectCallBack() {
             @Override
