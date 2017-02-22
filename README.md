@@ -25,7 +25,7 @@
                  //临时图片保存位置
                 .setRootDir("dir")
                 //是否裁剪
-                .setCanCrop(true)
+                .setCrop(true)
                 //结果接收
                 .setCallBack(new ImageSelectCallBack() {
                     @Override
@@ -51,6 +51,23 @@
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         imageSelectUtils.onResult(requestCode, resultCode, data);
     }
+    
+    //删除产生的所有文件,包括目录和需要的文件,异步方式
+    //如果只是想删除拍照产生的照片,那么无需调用本方法,在裁剪后会自动删除,如果没有裁剪,则不删除
+    imageSelectUtils.clearImgs();
+```
+## 依赖
+```gradle
+
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+        
+        dependencies {
+	        compile 'com.github.yizeliang:ImageSelector:2.2'
+	}
 
 ```
-
