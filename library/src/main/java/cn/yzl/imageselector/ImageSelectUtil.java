@@ -8,20 +8,21 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
-
 
 /**
  * Created by YZL on 2017/2/22.
  */
-public class IamgeSelectUtils {
+public class ImageSelectUtil {
+
+    SelectConfig config;
 
     /**
      * 选择照片请求码
@@ -34,9 +35,7 @@ public class IamgeSelectUtils {
      */
     private static final int CROP_PTHOTO_REQUEST_CODE = 902;
 
-    private final Context context;
 
-    private Object obj;
     private Uri tempUri;//原图保存地址
     private String tempPath;
     private String targetPath;
@@ -45,29 +44,23 @@ public class IamgeSelectUtils {
      */
     private boolean isClickCamera;
 
-    public IamgeSelectUtils(Context context, Activity obj) {
-        this.obj = obj;
-        this.context = context;
-    }
 
-    public IamgeSelectUtils(Context context, Fragment obj) {
-        this.obj = obj;
-        this.context = context;
+    protected ImageSelectUtil(SelectConfig config) {
+        this.config = config;
     }
-
 
     public void openCaram() {
         targetPath = null;
         File file = new FileStorage().createFile();
         tempPath = file.getAbsolutePath();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             //通过FileProvider创建一个content类型的Uri
-            tempUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", file);
+            tempUri = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID + ".fileprovider", file);
         } else {
             tempUri = Uri.fromFile(file);
         }
         Intent intent = new Intent();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
         }
         intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);//设置Action为拍照
@@ -82,11 +75,28 @@ public class IamgeSelectUtils {
         startIntent(intent, REQUEST_PICK_IMAGE);
     }
 
+
+    /**
+     * 4.4 以下处理方法
+     *
+     * @param intent
+     */
+    private void handleImageBeforeKitKat(Intent intent) {
+        tempUri = intent.getData();
+        tempPath = getImagePath(tempUri, null);
+        cropPhotoZoom();
+    }
+
+    /**
+     * 4.4 以上处理方法
+     *
+     * @param data
+     */
     @TargetApi(19)
     private void handleImageOnKitKat(Intent data) {
         tempPath = null;
         tempUri = data.getData();
-        if (DocumentsContract.isDocumentUri(context, tempUri)) {
+        if (DocumentsContract.isDocumentUri(getContext(), tempUri)) {
             //如果是document类型的uri,则通过document id处理
             String docId = DocumentsContract.getDocumentId(tempUri);
             if ("com.android.providers.media.documents".equals(tempUri.getAuthority())) {
@@ -117,7 +127,7 @@ public class IamgeSelectUtils {
     private String getImagePath(Uri uri, String selection) {
         String path = null;
         //通过Uri和selection老获取真实的图片路径
-        Cursor cursor = context.getContentResolver().query(uri, null, selection, null, null);
+        Cursor cursor = getContext().getContentResolver().query(uri, null, selection, null, null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
@@ -128,11 +138,11 @@ public class IamgeSelectUtils {
     }
 
     private void startIntent(Intent intent, int code) {
-        if (obj instanceof Fragment) {
-            ((Fragment) obj).startActivityForResult(intent, code);
+        if (config.getObject() instanceof Fragment) {
+            ((Fragment) config.getObject()).startActivityForResult(intent, code);
         }
-        if (obj instanceof Activity) {
-            ((Activity) obj).startActivityForResult(intent, code);
+        if (config.getObject() instanceof Activity) {
+            ((Activity) config.getObject()).startActivityForResult(intent, code);
         }
     }
 
@@ -140,6 +150,10 @@ public class IamgeSelectUtils {
      * 修剪照片
      */
     public void cropPhotoZoom() {
+
+        if (!canCrop()) {
+            return;
+        }
 
         File file = new FileStorage().createFile();
         targetPath = file.getAbsolutePath();
@@ -153,7 +167,7 @@ public class IamgeSelectUtils {
 //        }
 
         Intent intent = new Intent("com.android.camera.action.CROP");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         }
         intent.setDataAndType(tempUri, "image/*");
@@ -170,20 +184,19 @@ public class IamgeSelectUtils {
         startIntent(intent, CROP_PTHOTO_REQUEST_CODE);
     }
 
-
-    private void handleImageBeforeKitKat(Intent intent) {
-        tempUri = intent.getData();
-        tempPath = getImagePath(tempUri, null);
-        cropPhotoZoom();
+    private boolean canCrop() {
+        if (!config.isCanCrop()) {
+            config.getCallBack().sucess(tempPath);
+        }
+        return config.isCanCrop();
     }
 
-
-    public String onResult(int requestCode, int resultCode, Intent data) {
+    public void onResult(int requestCode, int resultCode, Intent data) {
         try {
             switch (requestCode) {
                 case REQUEST_PICK_IMAGE://从相册选择
                     isClickCamera = false;
-                    if (Build.VERSION.SDK_INT >= 19) {
+                    if (android.os.Build.VERSION.SDK_INT >= 19) {
                         handleImageOnKitKat(data);
                     } else {
                         handleImageBeforeKitKat(data);
@@ -196,14 +209,12 @@ public class IamgeSelectUtils {
                     }
                     break;
                 case CROP_PTHOTO_REQUEST_CODE://裁剪完成
+                    config.getCallBack().sucess(targetPath);
                     deleteCameraTempImg();
-                    return targetPath;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            config.getCallBack().error(e);
         }
-        return null;
     }
 
     /**
@@ -217,6 +228,68 @@ public class IamgeSelectUtils {
                     file.delete();
                 }
             }
+        }
+    }
+
+    private Context getContext() {
+        if (config.getObject() instanceof Activity) {
+            return (Activity) config.getObject();
+        }
+        if (config.getObject() instanceof Fragment) {
+            return ((Fragment) config.getObject()).getContext();
+        }
+        return null;
+    }
+
+    public static class Build {
+
+        private String rootDir;
+        private boolean canCrop;
+        private Object object;
+        private ImageSelectCallBack callBack;
+
+        private static final ImageSelectCallBack DEFAULT_CALLBACK = new ImageSelectCallBack() {
+            @Override
+            public void sucess(String path) {
+                Log.d("image_select", path);
+            }
+
+            @Override
+            public void error(Exception e) {
+                e.printStackTrace();
+            }
+        };
+
+        public Build setCallBack(ImageSelectCallBack callBack) {
+            this.callBack = callBack;
+            return this;
+        }
+
+        public Build(Activity activity) {
+            object = activity;
+        }
+
+        public Build(Fragment fragment) {
+            object = fragment;
+        }
+
+        public Build setRootDir(String rootDir) {
+            this.rootDir = rootDir;
+            return this;
+        }
+
+        public Build setCanCrop(boolean canCrop) {
+            this.canCrop = canCrop;
+            return this;
+        }
+
+        public ImageSelectUtil build() {
+            SelectConfig selectConfig =
+                    new SelectConfig(rootDir, canCrop,
+                            object,
+                            callBack == null ? DEFAULT_CALLBACK : callBack);
+            ImageSelectUtil imageSelectUtil = new ImageSelectUtil(selectConfig);
+            return imageSelectUtil;
         }
     }
 }
