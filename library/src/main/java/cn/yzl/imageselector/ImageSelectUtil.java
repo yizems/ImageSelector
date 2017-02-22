@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.HandlerThread;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -230,6 +231,19 @@ public class ImageSelectUtil {
                 }
             }
         }
+    }
+
+    /**
+     * 异步删除所有文件,包括选择的文件和根文件夹,
+     * 如果是相机拍摄的照片,会在裁剪后自动删除,无需调用该方法
+     */
+    public void clearIamges() {
+        new HandlerThread("delimgs") {
+            @Override
+            protected void onLooperPrepared() {
+                fileStorage.clearFile();
+            }
+        }.start();
     }
 
     private Context getContext() {

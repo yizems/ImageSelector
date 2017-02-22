@@ -22,8 +22,11 @@
 ```java
 
  ImageSelectUtil imageSelectUtils = new ImageSelectUtil.Build(this)
-                .setRootDir("attend")
+                 //临时图片保存位置
+                .setRootDir("dir")
+                //是否裁剪
                 .setCanCrop(true)
+                //结果接收
                 .setCallBack(new ImageSelectCallBack() {
                     @Override
                     public void sucess(String s) {
@@ -38,12 +41,13 @@
                 }).build();
 
 
+    //打开相机选择
+    imageSelectUtils.openCaram();
+    //打开相册选择
+    imageSelectUtils.openAlum();
 
-                    imageSelectUtils.openCaram();
-                    imageSelectUtils.openAlum();
 
-
-@Override
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         imageSelectUtils.onResult(requestCode, resultCode, data);
     }
