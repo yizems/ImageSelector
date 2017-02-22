@@ -21,7 +21,32 @@
 
 ```java
 
+ ImageSelectUtil imageSelectUtils = new ImageSelectUtil.Build(this)
+                .setRootDir("attend")
+                .setCanCrop(true)
+                .setCallBack(new ImageSelectCallBack() {
+                    @Override
+                    public void sucess(String s) {
+                        Logger.e(s);
+                        LoadLocalImageUtil.displayFromSDCard(s, ivUser);
+                    }
 
+                    @Override
+                    public void error(Exception e) {
+                        e.printStackTrace();
+                    }
+                }).build();
+
+
+
+                    imageSelectUtils.openCaram();
+                    imageSelectUtils.openAlum();
+
+
+@Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        imageSelectUtils.onResult(requestCode, resultCode, data);
+    }
 
 ```
 
