@@ -23,6 +23,12 @@ import java.io.File;
  */
 public class ImageSelectUtil {
 
+    private static String pckName;
+
+    public static void init(String pck) {
+        pckName = pck;
+    }
+
     private FileStorage fileStorage;
     SelectConfig config;
 
@@ -57,7 +63,10 @@ public class ImageSelectUtil {
         tempPath = file.getAbsolutePath();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             //通过FileProvider创建一个content类型的Uri
-            tempUri = FileProvider.getUriForFile(getContext(), "cn.yzl.imageselector.fileprovider", file);
+            if (TextUtils.isEmpty(pckName)) {
+                throw new NullPointerException("ImageUtils 还没有初始化");
+            }
+            tempUri = FileProvider.getUriForFile(getContext(), pckName + ".fileprovider", file);
         } else {
             tempUri = Uri.fromFile(file);
         }
