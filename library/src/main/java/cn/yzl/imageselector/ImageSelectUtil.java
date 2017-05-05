@@ -203,7 +203,7 @@ public class ImageSelectUtil {
     }
 
     public void onResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != Activity.RESULT_OK) {
+        if (resultCode != Activity.RESULT_OK) {
             return;
         }
         try {
