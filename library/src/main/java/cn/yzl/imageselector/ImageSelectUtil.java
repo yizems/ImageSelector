@@ -203,6 +203,9 @@ public class ImageSelectUtil {
     }
 
     public void onResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Activity.RESULT_CANCELED) {
+            return;
+        }
         try {
             switch (requestCode) {
                 case REQUEST_PICK_IMAGE://从相册选择
