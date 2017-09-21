@@ -190,8 +190,6 @@ public class ImageSelectUtil {
             intent.putExtra("aspectX", config.getxRatio());
             intent.putExtra("aspectY", config.getyRatio());
         }
-        intent.putExtra("aspectX", config.isFreeRatio() ? 0.1f : config.getxRatio());
-        intent.putExtra("aspectY", config.isFreeRatio() ? 0.1f : config.getyRatio());
         intent.putExtra("scale", true);
         intent.putExtra("return-data", false);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
