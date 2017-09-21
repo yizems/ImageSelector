@@ -37,7 +37,7 @@
                  //临时图片保存位置
                 .setRootDir("dir")
                 //是否裁剪
-                .setCrop(true)
+                .setCrop(true)//.setCrop(true,1,2) 裁剪比例
                 //结果接收
                 .setCallBack(new ImageSelectCallBack() {
                     @Override
@@ -81,7 +81,7 @@
 	}
         
         dependencies {
-	        compile 'com.github.yizeliang:ImageSelector:2.4'
+	        compile 'com.github.yizeliang:ImageSelector:2.8'
 	}
 
 ```

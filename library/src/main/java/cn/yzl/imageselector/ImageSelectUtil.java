@@ -183,8 +183,8 @@ public class ImageSelectUtil {
         }
         intent.setDataAndType(tempUri, "image/*");
         intent.putExtra("crop", "true");
-        intent.putExtra("aspectX", 1);
-        intent.putExtra("aspectY", 1);
+        intent.putExtra("aspectX", config.getxRatio());
+        intent.putExtra("aspectY", config.getyRatio());
         intent.putExtra("scale", true);
         intent.putExtra("return-data", false);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
@@ -275,6 +275,9 @@ public class ImageSelectUtil {
         private Object object;
         private ImageSelectCallBack callBack;
 
+        private int xRatio = 1;
+        private int yRatio = 1;
+
 
         private static final ImageSelectCallBack DEFAULT_CALLBACK = new ImageSelectCallBack() {
             @Override
@@ -311,9 +314,16 @@ public class ImageSelectUtil {
             return this;
         }
 
+        public Build setCrop(boolean canCrop, int xRatio, int yRatio) {
+            this.canCrop = canCrop;
+            this.xRatio = xRatio;
+            this.yRatio = yRatio;
+            return this;
+        }
+
         public ImageSelectUtil build() {
             SelectConfig selectConfig =
-                    new SelectConfig(rootDir, canCrop,
+                    new SelectConfig(rootDir, canCrop, xRatio, yRatio,
                             object,
                             callBack == null ? DEFAULT_CALLBACK : callBack);
             ImageSelectUtil imageSelectUtil = new ImageSelectUtil(selectConfig);
