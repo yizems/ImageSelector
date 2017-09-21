@@ -13,13 +13,15 @@ public class SelectConfig {
     private int xRatio;
     private int yRatio;
 
+    private boolean freeRatio;
 
     private ImageSelectCallBack callBack;
 
-    public SelectConfig(String rootDir, boolean crop, int xRatio, int yRatio, Object object, ImageSelectCallBack callBack) {
+    public SelectConfig(String rootDir, boolean crop, int xRatio, int yRatio, boolean freeRatio, Object o, ImageSelectCallBack callBack) {
         this.rootDir = rootDir;
         this.crop = crop;
-        this.object = object;
+        this.freeRatio = freeRatio;
+        this.object = o;
         this.xRatio = xRatio;
         this.yRatio = yRatio;
         this.callBack = callBack;
@@ -71,5 +73,13 @@ public class SelectConfig {
 
     public void setCallBack(ImageSelectCallBack callBack) {
         this.callBack = callBack;
+    }
+
+    public boolean isFreeRatio() {
+        return freeRatio;
+    }
+
+    public void setFreeRatio(boolean freeRatio) {
+        this.freeRatio = freeRatio;
     }
 }

@@ -38,6 +38,7 @@
                 .setRootDir("dir")
                 //是否裁剪
                 .setCrop(true)//.setCrop(true,1,2) 裁剪比例
+		.freeRatio() //自由比例,上面设置的比例会失效
                 //结果接收
                 .setCallBack(new ImageSelectCallBack() {
                     @Override
@@ -81,7 +82,7 @@
 	}
         
         dependencies {
-	        compile 'com.github.yizeliang:ImageSelector:2.8'
+	        compile 'com.github.yizeliang:ImageSelector:2.9'
 	}
 
 ```
