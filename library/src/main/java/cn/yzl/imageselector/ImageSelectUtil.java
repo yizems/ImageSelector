@@ -183,6 +183,13 @@ public class ImageSelectUtil {
         }
         intent.setDataAndType(tempUri, "image/*");
         intent.putExtra("crop", "true");
+        if (config.isFreeRatio()) {
+            intent.putExtra("aspectX", 0.1f);
+            intent.putExtra("aspectY", 0.1f);
+        } else {
+            intent.putExtra("aspectX", config.getxRatio());
+            intent.putExtra("aspectY", config.getyRatio());
+        }
         intent.putExtra("aspectX", config.isFreeRatio() ? 0.1f : config.getxRatio());
         intent.putExtra("aspectY", config.isFreeRatio() ? 0.1f : config.getyRatio());
         intent.putExtra("scale", true);
