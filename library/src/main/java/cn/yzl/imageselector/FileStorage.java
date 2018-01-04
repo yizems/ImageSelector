@@ -11,14 +11,20 @@ class FileStorage {
     public static String rootDir;
 
     public FileStorage() {
-
+        createRootDir();
     }
 
     public FileStorage(String dir) {
         rootDir = dir;
-        File rootDirFile = new File(rootDir);
-        if (!rootDirFile.exists()) {
-            rootDirFile.mkdirs();
+        createRootDir();
+    }
+
+    public void createRootDir(){
+        if (rootDir != null) {
+            File rootDirFile = new File(rootDir);
+            if (!rootDirFile.exists()) {
+                rootDirFile.mkdirs();
+            }
         }
     }
 
