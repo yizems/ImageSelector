@@ -1,10 +1,10 @@
-package cn.yzl.rx.imgpicker;
+package cn.yzl.imgpicker;
 
 /**
  * Created by YZL on 2017/2/22.
  */
 
-public class ImgPickerOption {
+public class ImgPickerOption implements Cloneable{
     private String rootDir;
     private boolean crop;
     private int xRatio;
@@ -74,5 +74,10 @@ public class ImgPickerOption {
     public ImgPickerOption setFreeRatio(boolean freeRatio) {
         this.freeRatio = freeRatio;
         return this;
+    }
+
+    @Override
+    public ImgPickerOption clone(){
+        return new ImgPickerOption(rootDir,crop,xRatio,yRatio,freeRatio);
     }
 }

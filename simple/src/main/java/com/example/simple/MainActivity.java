@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide;
 
 import java.io.File;
 
-import cn.yzl.rx.imgpicker.ImgPicker;
+import cn.yzl.imgpicker.ImgPicker;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         iv = findViewById(R.id.iv);
-        rxImagePicker = new ImgPicker(this)
+        rxImagePicker = new ImgPicker(this,ImgPicker.DEFAULT_OPTION.clone().setCrop(false))
                 .success(new ImgPicker.SucessCallBack() {
                     @Override
                     public void sucess(String path) {

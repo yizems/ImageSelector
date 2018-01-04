@@ -1,4 +1,4 @@
-package cn.yzl.rx.imgpicker;
+package cn.yzl.imgpicker;
 
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -78,7 +78,7 @@ public class ImgPicker {
         return this;
     }
 
-    public void setDefaultFailCallBack(FailCallBack failCallBack) {
+    public static void setDefaultFailCallBack(FailCallBack failCallBack) {
         defaultFailCallBack = failCallBack;
     }
 

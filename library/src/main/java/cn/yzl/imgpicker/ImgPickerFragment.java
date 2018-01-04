@@ -1,4 +1,4 @@
-package cn.yzl.rx.imgpicker;
+package cn.yzl.imgpicker;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

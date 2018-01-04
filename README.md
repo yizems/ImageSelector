@@ -7,6 +7,40 @@
 - 适配Android 7
 - Android 4.4 以下也可以使用
 
+
+
+## 1.5 更新日志
+
+### 4.0 版本
+
+使用看simple
+
+
+```gradle
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+
+        dependencies {
+	        compile 'com.github.yizeliang:ImageSelector:4.0'
+	}
+
+```
+
+
+
+
+参考
+
+https://github.com/tbruyelle/RxPermissions
+
+
+
+
+
 ## 2 使用
 
 
