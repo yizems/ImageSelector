@@ -1,25 +1,25 @@
-package cn.yzl.imageselector;
+package cn.yzl.rx.imgpicker;
 
+import android.os.Environment;
 import android.text.TextUtils;
 
 import java.io.File;
 import java.util.UUID;
+
 /**
  * Created by Fsh on 2016/12/28.
  */
 class FileStorage {
-    public static String rootDir;
 
-    public FileStorage() {
-        createRootDir();
-    }
+    public static String rootDir;
 
     public FileStorage(String dir) {
         rootDir = dir;
         createRootDir();
     }
 
-    public void createRootDir(){
+
+    public void createRootDir() {
         if (rootDir != null) {
             File rootDirFile = new File(rootDir);
             if (!rootDirFile.exists()) {
@@ -69,6 +69,10 @@ class FileStorage {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static String getDefultDir() {
+        return Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "ImgPicker";
     }
 
 }
