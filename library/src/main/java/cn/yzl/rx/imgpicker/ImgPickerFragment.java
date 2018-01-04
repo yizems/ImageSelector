@@ -1,38 +1,27 @@
-package cn.yzl.imageselector;
+package cn.yzl.rx.imgpicker;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.ContentUris;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.HandlerThread;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
+import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.io.File;
 
 /**
- * Created by YZL on 2017/2/22.
+ * Created by YZL on 2018/1/4.
  */
-public class ImageSelectUtil {
-
-    private static String pckName;
-
-    public static void init(String pck,String rootDir) {
-        pckName = pck;
-        FileStorage.rootDir=rootDir;
-    }
-
-    private FileStorage fileStorage;
-    SelectConfig config;
-
+public class ImgPickerFragment extends Fragment {
     /**
      * 选择照片请求码
      */
@@ -44,6 +33,13 @@ public class ImageSelectUtil {
      */
     private static final int CROP_PTHOTO_REQUEST_CODE = 902;
 
+    private FileStorage fileStorage;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
 
     private Uri tempUri;//原图保存地址
     private String tempPath;
@@ -53,14 +49,23 @@ public class ImageSelectUtil {
      */
     private boolean isClickCamera;
 
+    private ImgPickerOption option;
 
-    protected ImageSelectUtil(SelectConfig config) {
-        this.config = config;
-        if (config.getRootDir() != null) {
-            fileStorage = new FileStorage(config.getRootDir());
-        } else {
-            fileStorage = new FileStorage();
-        }
+    private ImgPicker.SucessCallBack sucessCallBack;
+
+    private ImgPicker.FailCallBack failCallBack;
+
+    public void setSucessCallBack(ImgPicker.SucessCallBack sucessCallBack) {
+        this.sucessCallBack = sucessCallBack;
+    }
+
+    public void setFailCallBack(ImgPicker.FailCallBack failCallBack) {
+        this.failCallBack = failCallBack;
+    }
+
+    public void setOption(ImgPickerOption option) {
+        this.option = option;
+        fileStorage = new FileStorage(option.getRootDir());
     }
 
     public void openCaram() {
@@ -68,27 +73,24 @@ public class ImageSelectUtil {
         tempPath = file.getAbsolutePath();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             //通过FileProvider创建一个content类型的Uri
-            if (TextUtils.isEmpty(pckName)) {
-                throw new NullPointerException("ImageUtils 还没有初始化");
-            }
-            tempUri = FileProvider.getUriForFile(getContext(), pckName + ".fileprovider", file);
+            tempUri = FileProvider.getUriForFile(getContext(), getActivity().getPackageName() + ".fileprovider", file);
         } else {
             tempUri = Uri.fromFile(file);
         }
         Intent intent = new Intent();
 //        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
 //        }
         intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);//设置Action为拍照
         intent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);//将拍取的照片保存到指定URI
-        startIntent(intent, REQUEST_CAPTURE);
+        startActivityForResult(intent, REQUEST_CAPTURE);
     }
 
     public void openAlum() {
         targetPath = null;
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-        startIntent(intent, REQUEST_PICK_IMAGE);
+        startActivityForResult(intent, REQUEST_PICK_IMAGE);
     }
 
 
@@ -112,7 +114,7 @@ public class ImageSelectUtil {
     private void handleImageOnKitKat(Intent data) {
         tempPath = null;
         tempUri = data.getData();
-        if (DocumentsContract.isDocumentUri(getContext(), tempUri)) {
+        if (DocumentsContract.isDocumentUri(getActivity(), tempUri)) {
             //如果是document类型的uri,则通过document id处理
             String docId = DocumentsContract.getDocumentId(tempUri);
             if ("com.android.providers.media.documents".equals(tempUri.getAuthority())) {
@@ -143,7 +145,7 @@ public class ImageSelectUtil {
     private String getImagePath(Uri uri, String selection) {
         String path = null;
         //通过Uri和selection老获取真实的图片路径
-        Cursor cursor = getContext().getContentResolver().query(uri, null, selection, null, null);
+        Cursor cursor = getActivity().getContentResolver().query(uri, null, selection, null, null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
@@ -153,21 +155,15 @@ public class ImageSelectUtil {
         return path;
     }
 
-    private void startIntent(Intent intent, int code) {
-        if (config.getObject() instanceof Fragment) {
-            ((Fragment) config.getObject()).startActivityForResult(intent, code);
-        }
-        if (config.getObject() instanceof Activity) {
-            ((Activity) config.getObject()).startActivityForResult(intent, code);
-        }
-    }
 
     /**
      * 修剪照片
      */
     public void cropPhotoZoom() {
-        if (!canCrop()) {
-            config.getCallBack().sucess(tempPath);
+        if (!option.getCrop()) {
+            if (sucessCallBack != null) {
+                sucessCallBack.sucess(tempPath);
+            }
             return;
         }
 
@@ -188,12 +184,12 @@ public class ImageSelectUtil {
         }
         intent.setDataAndType(tempUri, "image/*");
         intent.putExtra("crop", "true");
-        if (config.isFreeRatio()) {
+        if (option.isFreeRatio()) {
             intent.putExtra("aspectX", 0.1f);
             intent.putExtra("aspectY", 0.1f);
         } else {
-            intent.putExtra("aspectX", config.getxRatio());
-            intent.putExtra("aspectY", config.getyRatio());
+            intent.putExtra("aspectX", option.getxRatio());
+            intent.putExtra("aspectY", option.getyRatio());
         }
         intent.putExtra("scale", true);
         intent.putExtra("return-data", false);
@@ -202,16 +198,12 @@ public class ImageSelectUtil {
                 Bitmap.CompressFormat.JPEG.toString());
         intent.putExtra("noFaceDetection", true);
 
-        startIntent(intent, CROP_PTHOTO_REQUEST_CODE);
+        startActivityForResult(intent, CROP_PTHOTO_REQUEST_CODE);
     }
 
-    private boolean canCrop() {
-        if (!config.getCrop()) {
-        }
-        return config.getCrop();
-    }
-
-    public void onResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != Activity.RESULT_OK) {
             return;
         }
@@ -227,16 +219,20 @@ public class ImageSelectUtil {
                     break;
                 case REQUEST_CAPTURE://拍照
                     isClickCamera = true;
-                    if (resultCode == Activity.RESULT_OK) {
-                        cropPhotoZoom();
-                    }
+                    cropPhotoZoom();
                     break;
                 case CROP_PTHOTO_REQUEST_CODE://裁剪完成
-                    config.getCallBack().sucess(targetPath);
-//                    deleteCameraTempImg();
+                    if (sucessCallBack != null) {
+                        sucessCallBack.sucess(targetPath);
+                    }
+                    deleteCameraTempImg();
             }
         } catch (Exception e) {
-            config.getCallBack().error(e);
+            if (failCallBack != null) {
+                failCallBack.error(e);
+            } else {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -267,83 +263,4 @@ public class ImageSelectUtil {
         }.start();
     }
 
-    private Context getContext() {
-        if (config.getObject() instanceof Activity) {
-            return (Activity) config.getObject();
-        }
-        if (config.getObject() instanceof Fragment) {
-            return ((Fragment) config.getObject()).getContext();
-        }
-        return null;
-    }
-
-    public static class Build {
-
-        private String rootDir;
-        private boolean canCrop;
-        private Object object;
-        private ImageSelectCallBack callBack;
-
-        private boolean freeRatio;
-
-        private int xRatio = 1;
-        private int yRatio = 1;
-
-
-        private static final ImageSelectCallBack DEFAULT_CALLBACK = new ImageSelectCallBack() {
-            @Override
-            public void sucess(String path) {
-                Log.d("image_select", path);
-            }
-
-            @Override
-            public void error(Exception e) {
-                e.printStackTrace();
-            }
-        };
-
-        public Build setCallBack(ImageSelectCallBack callBack) {
-            this.callBack = callBack;
-            return this;
-        }
-
-        public Build(Activity activity) {
-            object = activity;
-        }
-
-        public Build(Fragment fragment) {
-            object = fragment;
-        }
-
-        public Build setRootDir(String rootDir) {
-            this.rootDir = rootDir;
-            return this;
-        }
-
-        public Build setCrop(boolean canCrop) {
-            this.canCrop = canCrop;
-            return this;
-        }
-
-        public Build setCrop(boolean canCrop, int xRatio, int yRatio) {
-            this.canCrop = canCrop;
-            this.xRatio = xRatio;
-            this.yRatio = yRatio;
-            return this;
-        }
-
-        public Build freeRatio() {
-            freeRatio = true;
-            return this;
-        }
-
-        public ImageSelectUtil build() {
-            SelectConfig selectConfig =
-                    new SelectConfig(rootDir, canCrop, xRatio, yRatio, freeRatio,
-                            object,
-                            callBack == null ? DEFAULT_CALLBACK : callBack);
-            ImageSelectUtil imageSelectUtil = new ImageSelectUtil(selectConfig);
-            return imageSelectUtil;
-        }
-    }
 }
