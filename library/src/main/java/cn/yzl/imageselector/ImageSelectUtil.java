@@ -76,9 +76,9 @@ public class ImageSelectUtil {
             tempUri = Uri.fromFile(file);
         }
         Intent intent = new Intent();
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
-        }
+//        }
         intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);//设置Action为拍照
         intent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);//将拍取的照片保存到指定URI
         startIntent(intent, REQUEST_CAPTURE);
@@ -166,8 +166,8 @@ public class ImageSelectUtil {
      * 修剪照片
      */
     public void cropPhotoZoom() {
-
         if (!canCrop()) {
+            config.getCallBack().sucess(tempPath);
             return;
         }
 
@@ -207,7 +207,6 @@ public class ImageSelectUtil {
 
     private boolean canCrop() {
         if (!config.getCrop()) {
-            config.getCallBack().sucess(tempPath);
         }
         return config.getCrop();
     }

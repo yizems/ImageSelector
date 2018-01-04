@@ -11,7 +11,12 @@ class FileStorage {
     public static String rootDir;
 
     public FileStorage() {
-
+        if (rootDir != null) {
+            File rootDirFile = new File(rootDir);
+            if (!rootDirFile.exists()) {
+                rootDirFile.mkdirs();
+            }
+        }
     }
 
     public FileStorage(String dir) {

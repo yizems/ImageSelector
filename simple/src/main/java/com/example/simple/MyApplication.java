@@ -2,6 +2,10 @@ package com.example.simple;
 
 import android.app.Application;
 import android.os.Environment;
+import android.util.Log;
+
+import java.io.File;
+import java.util.logging.Logger;
 
 import cn.yzl.imageselector.ImageSelectUtil;
 
@@ -13,6 +17,8 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        ImageSelectUtil.init(getPackageName(), Environment.getExternalStorageDirectory()+"/aImageSelector");
+        String s = Environment.getExternalStorageDirectory() + "/aImageSelector";
+        Log.e("sss", s);
+        ImageSelectUtil.init(getPackageName(), s);
     }
 }
