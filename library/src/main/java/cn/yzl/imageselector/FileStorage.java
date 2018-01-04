@@ -1,28 +1,24 @@
 package cn.yzl.imageselector;
 
-import android.os.Environment;
 import android.text.TextUtils;
 
 import java.io.File;
 import java.util.UUID;
-
 /**
  * Created by Fsh on 2016/12/28.
  */
+class FileStorage {
+    public static String rootDir;
 
-public class FileStorage {
+    public FileStorage() {
 
-    public static final String rootDir = Environment.getExternalStorageDirectory() + "/";
+    }
 
-    private String rootDirName;
-
-    public FileStorage(String rootDirName) {
-        this.rootDirName = rootDirName;
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            File rootDirFile = new File(rootDir + rootDirName);
-            if (!rootDirFile.exists()) {
-                rootDirFile.mkdirs();
-            }
+    public FileStorage(String dir) {
+        rootDir = dir;
+        File rootDirFile = new File(rootDir);
+        if (!rootDirFile.exists()) {
+            rootDirFile.mkdirs();
         }
     }
 
@@ -31,11 +27,11 @@ public class FileStorage {
         if (rootDir != null) {
             fileName = UUID.randomUUID().toString() + ".png";
         }
-        return new File(rootDir + rootDirName, fileName);
+        return new File(rootDir, fileName);
     }
 
     public void clearFile() {
-        deleteFolderFile(rootDir + rootDirName, true);
+        deleteFolderFile(rootDir, false);
     }
 
     /**

@@ -82,7 +82,7 @@
 	}
         
         dependencies {
-	        compile 'com.github.yizeliang:ImageSelector:2.9'
+	        compile 'com.github.yizeliang:ImageSelector:3.2'
 	}
 
 ```

@@ -25,8 +25,9 @@ public class ImageSelectUtil {
 
     private static String pckName;
 
-    public static void init(String pck) {
+    public static void init(String pck,String rootDir) {
         pckName = pck;
+        FileStorage.rootDir=rootDir;
     }
 
     private FileStorage fileStorage;
@@ -55,7 +56,11 @@ public class ImageSelectUtil {
 
     protected ImageSelectUtil(SelectConfig config) {
         this.config = config;
-        fileStorage = new FileStorage(config.getRootDir());
+        if (config.getRootDir() != null) {
+            fileStorage = new FileStorage(config.getRootDir());
+        } else {
+            fileStorage = new FileStorage();
+        }
     }
 
     public void openCaram() {

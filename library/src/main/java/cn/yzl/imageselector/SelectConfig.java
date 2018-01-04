@@ -1,7 +1,5 @@
 package cn.yzl.imageselector;
 
-import android.content.Context;
-
 /**
  * Created by YZL on 2017/2/22.
  */
