@@ -234,7 +234,7 @@ public class ImageSelectUtil {
                     break;
                 case CROP_PTHOTO_REQUEST_CODE://裁剪完成
                     config.getCallBack().sucess(targetPath);
-                    deleteCameraTempImg();
+//                    deleteCameraTempImg();
             }
         } catch (Exception e) {
             config.getCallBack().error(e);
