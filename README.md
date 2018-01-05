@@ -11,33 +11,14 @@
 
 ## 1.5 更新日志
 
-### 4.0 版本
+### 4.0 版本 [![](https://jitpack.io/v/yizeliang/ImageSelector.svg)](https://jitpack.io/#yizeliang/ImageSelector)
 
 使用看simple
-
-
-```gradle
-	allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
-	}
-
-        dependencies {
-	        compile 'com.github.yizeliang:ImageSelector:4.0'
-	}
-
-```
-
-
 
 
 参考
 
 https://github.com/tbruyelle/RxPermissions
-
-
 
 
 
