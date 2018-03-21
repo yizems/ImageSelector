@@ -69,28 +69,42 @@ public class ImgPickerFragment extends Fragment {
     }
 
     public void openCaram() {
-        File file = fileStorage.createFile();
-        tempPath = file.getAbsolutePath();
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            //通过FileProvider创建一个content类型的Uri
-            tempUri = FileProvider.getUriForFile(getContext(), getActivity().getPackageName() + ".fileprovider", file);
-        } else {
-            tempUri = Uri.fromFile(file);
-        }
-        Intent intent = new Intent();
+        try {
+            File file = fileStorage.createFile();
+            tempPath = file.getAbsolutePath();
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                //通过FileProvider创建一个content类型的Uri
+                tempUri = FileProvider.getUriForFile(getContext(), getActivity().getPackageName() + ".fileprovider", file);
+            } else {
+                tempUri = Uri.fromFile(file);
+            }
+            Intent intent = new Intent();
 //        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
 //        }
-        intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);//设置Action为拍照
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);//将拍取的照片保存到指定URI
-        startActivityForResult(intent, REQUEST_CAPTURE);
+            intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);//设置Action为拍照
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);//将拍取的照片保存到指定URI
+            startActivityForResult(intent, REQUEST_CAPTURE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (failCallBack != null) {
+                failCallBack.error(e);
+            }
+        }
     }
 
     public void openAlum() {
-        targetPath = null;
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-        startActivityForResult(intent, REQUEST_PICK_IMAGE);
+        try {
+            targetPath = null;
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+            startActivityForResult(intent, REQUEST_PICK_IMAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (failCallBack != null) {
+                failCallBack.error(e);
+            }
+        }
     }
 
 
@@ -160,45 +174,49 @@ public class ImgPickerFragment extends Fragment {
      * 修剪照片
      */
     public void cropPhotoZoom() {
-        if (!option.getCrop()) {
-            if (sucessCallBack != null) {
-                sucessCallBack.sucess(tempPath);
+        try {
+            if (!option.getCrop()) {
+                if (sucessCallBack != null) {
+                    sucessCallBack.sucess(tempPath);
+                }
+                return;
             }
-            return;
-        }
-
-        File file = fileStorage.createFile();
-        targetPath = file.getAbsolutePath();
-        Uri outputUri = null;
-
+            File file = fileStorage.createFile();
+            targetPath = file.getAbsolutePath();
+            Uri outputUri = null;
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 //            //通过FileProvider创建一个content类型的Uri
 //            outputUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", file);
 //        } else {
-        outputUri = Uri.fromFile(file);
+            outputUri = Uri.fromFile(file);
 //        }
+            Intent intent = new Intent("com.android.camera.action.CROP");
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+            intent.setDataAndType(tempUri, "image/*");
+            intent.putExtra("crop", "true");
+            if (option.isFreeRatio()) {
+                intent.putExtra("aspectX", 0.1f);
+                intent.putExtra("aspectY", 0.1f);
+            } else {
+                intent.putExtra("aspectX", option.getxRatio());
+                intent.putExtra("aspectY", option.getyRatio());
+            }
+            intent.putExtra("scale", true);
+            intent.putExtra("return-data", false);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
+            intent.putExtra("outputFormat",
+                    Bitmap.CompressFormat.JPEG.toString());
+            intent.putExtra("noFaceDetection", true);
 
-        Intent intent = new Intent("com.android.camera.action.CROP");
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivityForResult(intent, CROP_PTHOTO_REQUEST_CODE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (failCallBack != null) {
+                failCallBack.error(e);
+            }
         }
-        intent.setDataAndType(tempUri, "image/*");
-        intent.putExtra("crop", "true");
-        if (option.isFreeRatio()) {
-            intent.putExtra("aspectX", 0.1f);
-            intent.putExtra("aspectY", 0.1f);
-        } else {
-            intent.putExtra("aspectX", option.getxRatio());
-            intent.putExtra("aspectY", option.getyRatio());
-        }
-        intent.putExtra("scale", true);
-        intent.putExtra("return-data", false);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
-        intent.putExtra("outputFormat",
-                Bitmap.CompressFormat.JPEG.toString());
-        intent.putExtra("noFaceDetection", true);
-
-        startActivityForResult(intent, CROP_PTHOTO_REQUEST_CODE);
     }
 
     @Override
