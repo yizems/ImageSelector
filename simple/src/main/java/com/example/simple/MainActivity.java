@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 
 import cn.yzl.imgpicker.ImgPicker;
+import cn.yzl.imgpicker.PickerResult;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,12 +22,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         iv = findViewById(R.id.iv);
-        rxImagePicker = new ImgPicker(this,ImgPicker.DEFAULT_OPTION.clone().setCrop(false))
+        rxImagePicker = new ImgPicker(this,ImgPicker.DEFAULT_OPTION.clone().setCrop(true))
                 .success(new ImgPicker.SucessCallBack() {
+
                     @Override
-                    public void sucess(String path) {
+                    public void sucess(PickerResult ret) {
                         Glide.with(MainActivity.this)
-                                .load(new File(path))
+                                .load(ret.uri)
                                 .into(iv);
                     }
                 });

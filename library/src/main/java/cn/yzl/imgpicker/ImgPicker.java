@@ -1,7 +1,8 @@
 package cn.yzl.imgpicker;
 
-import android.app.Activity;
-import android.app.FragmentManager;
+
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 
 /**
  * Created by YZL on 2018/1/4.
@@ -20,29 +21,29 @@ public class ImgPicker {
 
     ImgPickerFragment mRxImgPickerFragment;
 
-    public ImgPicker(Activity activity) {
+    public ImgPicker(FragmentActivity activity) {
         if (DEFAULT_OPTION == null) {
             throw new NullPointerException("默认配置不能为null");
         }
         init(activity, DEFAULT_OPTION);
     }
 
-    public ImgPicker(Activity activity, ImgPickerOption option) {
+    public ImgPicker(FragmentActivity activity, ImgPickerOption option) {
         init(activity, option);
     }
 
-    private void init(Activity activity, ImgPickerOption option) {
+    private void init(FragmentActivity activity, ImgPickerOption option) {
         mRxImgPickerFragment = getRxPermissionsFragment(activity);
         mRxImgPickerFragment.setOption(option);
         mRxImgPickerFragment.setFailCallBack(defaultFailCallBack);
     }
 
-    private ImgPickerFragment getRxPermissionsFragment(Activity activity) {
+    private ImgPickerFragment getRxPermissionsFragment(FragmentActivity activity) {
         ImgPickerFragment rxImgPickerFragment = findRxImgPickerFragment(activity);
         boolean isNewInstance = rxImgPickerFragment == null;
         if (isNewInstance) {
             rxImgPickerFragment = new ImgPickerFragment();
-            FragmentManager fragmentManager = activity.getFragmentManager();
+            FragmentManager fragmentManager = activity.getSupportFragmentManager();
             fragmentManager
                     .beginTransaction()
                     .add(rxImgPickerFragment, TAG)
@@ -52,8 +53,8 @@ public class ImgPicker {
         return rxImgPickerFragment;
     }
 
-    private ImgPickerFragment findRxImgPickerFragment(Activity activity) {
-        return (ImgPickerFragment) activity.getFragmentManager().findFragmentByTag(TAG);
+    private ImgPickerFragment findRxImgPickerFragment(FragmentActivity activity) {
+        return (ImgPickerFragment) activity.getSupportFragmentManager().findFragmentByTag(TAG);
     }
 
     public static void setDefaultOption(ImgPickerOption defaultOption) {
@@ -83,7 +84,7 @@ public class ImgPicker {
     }
 
     public interface SucessCallBack {
-        void sucess(String path);
+        void sucess(PickerResult ret);
     }
 
     public interface FailCallBack {

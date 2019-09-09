@@ -16,7 +16,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        String s = Environment.getExternalStorageDirectory() + "/aImageSelector";
+        String s = getCacheDir().getAbsolutePath() + "/aImageSelector";
         Log.e("sss", s);
         ImgPicker.setDefaultOption(new ImgPickerOption()
                 .setCrop(true).setRootDir(s));
