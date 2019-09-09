@@ -237,7 +237,7 @@ public class ImgPickerFragment extends Fragment {
 
             ret.fileName = cursor.getString(0);
             ret.size = cursor.getLong(1);
-
+            cursor.close();
             sucessCallBack.sucess(ret);
         }
     }
