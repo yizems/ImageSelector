@@ -1,13 +1,11 @@
 package com.example.simple;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-
-import java.io.File;
 
 import cn.yzl.imgpicker.ImgPicker;
 import cn.yzl.imgpicker.PickerResult;

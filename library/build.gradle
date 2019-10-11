@@ -4,8 +4,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 50
-        versionName "5.0.1"
+        versionCode 51
+        versionName "5.1.0"
     }
     buildTypes {
         release {
@@ -16,5 +16,5 @@ android {
 }
 
 dependencies {
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    compileOnly 'androidx.appcompat:appcompat:1.0.0'
 }
