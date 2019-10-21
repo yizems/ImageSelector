@@ -1,7 +1,11 @@
 package com.example.simple;
 
+import android.Manifest;
+import android.os.Build;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.View;
 import android.widget.ImageView;
 
@@ -20,7 +24,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         iv = findViewById(R.id.iv);
-        rxImagePicker = new ImgPicker(this,ImgPicker.DEFAULT_OPTION.clone().setCrop(true))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA,
+                    Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+        }
+        rxImagePicker = new ImgPicker(this, ImgPicker.DEFAULT_OPTION.clone().setCrop(true)
+                .setRootDir(this.getCacheDir().getAbsolutePath()))
                 .success(new ImgPicker.SucessCallBack() {
 
                     @Override

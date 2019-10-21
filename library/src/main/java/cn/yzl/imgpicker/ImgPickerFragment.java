@@ -2,22 +2,19 @@ package cn.yzl.imgpicker;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.HandlerThread;
 import android.provider.MediaStore;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.FileProvider;
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
+
 import java.io.File;
-import java.util.List;
 
 /**
  * Created by YZL on 2018/1/4.
@@ -73,25 +70,12 @@ public class ImgPickerFragment extends Fragment {
         try {
             File file = fileStorage.createFile();
             tempPath = file.getAbsolutePath();
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                //通过FileProvider创建一个content类型的Uri
-                tempUri = FileProvider.getUriForFile(getContext(), getActivity().getPackageName() + ".fileprovider", file);
-            } else {
-                tempUri = Uri.fromFile(file);
-            }
+            tempUri = FileProvider.getUriForFile(getContext(), getActivity().getPackageName() + ".fileprovider", file);
             Intent intent = new Intent();
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            //添加这一句表示对目标应用临时授权该Uri所代表的文件
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-//        }
             intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);//设置Action为拍照
             intent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);//将拍取的照片保存到指定URI
-            List<ResolveInfo> resInfoList = getActivity().getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_ALL);
-            for (ResolveInfo resolveInfo : resInfoList) {
-                String packageName = resolveInfo.activityInfo.packageName;
-                getActivity().grantUriPermission(packageName, tempUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
             startActivityForResult(intent, REQUEST_CAPTURE);
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,12 +109,7 @@ public class ImgPickerFragment extends Fragment {
                 return;
             }
             File file = fileStorage.createFile();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                //通过FileProvider创建一个content类型的Uri
-                targetPath = FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".fileprovider", file);
-            } else {
-                targetPath = Uri.fromFile(file);
-            }
+            targetPath = FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".fileprovider", file);
             Intent intent = new Intent("com.android.camera.action.CROP");
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -150,12 +129,6 @@ public class ImgPickerFragment extends Fragment {
                     Bitmap.CompressFormat.PNG.toString());
             intent.putExtra("noFaceDetection", true);
 
-            List<ResolveInfo> resInfoList = getActivity().getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_ALL);
-            for (ResolveInfo resolveInfo : resInfoList) {
-                String packageName = resolveInfo.activityInfo.packageName;
-                getActivity().grantUriPermission(packageName, targetPath, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                getActivity().grantUriPermission(packageName, tempUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
             startActivityForResult(intent, CROP_PTHOTO_REQUEST_CODE);
         } catch (Exception e) {
             e.printStackTrace();
