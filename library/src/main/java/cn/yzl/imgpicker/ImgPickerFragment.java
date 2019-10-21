@@ -2,6 +2,8 @@ package cn.yzl.imgpicker;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -15,6 +17,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Created by YZL on 2018/1/4.
@@ -72,10 +75,16 @@ public class ImgPickerFragment extends Fragment {
             tempPath = file.getAbsolutePath();
             tempUri = FileProvider.getUriForFile(getContext(), getActivity().getPackageName() + ".fileprovider", file);
             Intent intent = new Intent();
+
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);//设置Action为拍照
             intent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);//将拍取的照片保存到指定URI
+            List<ResolveInfo> resInfoList = getContext().getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (ResolveInfo resolveInfo : resInfoList) {
+                String packageName = resolveInfo.activityInfo.packageName;
+                getContext().grantUriPermission(packageName, tempUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
             startActivityForResult(intent, REQUEST_CAPTURE);
         } catch (Exception e) {
             e.printStackTrace();
@@ -108,8 +117,11 @@ public class ImgPickerFragment extends Fragment {
                 callSuccess(tempUri);
                 return;
             }
+
             File file = fileStorage.createFile();
             targetPath = FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".fileprovider", file);
+
+
             Intent intent = new Intent("com.android.camera.action.CROP");
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -128,6 +140,13 @@ public class ImgPickerFragment extends Fragment {
             intent.putExtra("outputFormat",
                     Bitmap.CompressFormat.PNG.toString());
             intent.putExtra("noFaceDetection", true);
+
+            List<ResolveInfo> resInfoList = getContext().getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (ResolveInfo resolveInfo : resInfoList) {
+                String packageName = resolveInfo.activityInfo.packageName;
+                getContext().grantUriPermission(packageName, tempUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                getContext().grantUriPermission(packageName, targetPath, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
 
             startActivityForResult(intent, CROP_PTHOTO_REQUEST_CODE);
         } catch (Exception e) {
