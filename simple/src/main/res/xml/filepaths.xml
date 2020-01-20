@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
     <external-path path="." name="img" />
-    <external-path path="/" name="img2" />
     <cache-path
         name="cache"
-        path="/"/>
+        path="."/>
 </paths>
