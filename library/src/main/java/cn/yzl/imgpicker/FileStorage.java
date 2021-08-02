@@ -31,7 +31,7 @@ class FileStorage {
     public File createFile() {
         String fileName = "";
         if (rootDir != null) {
-            fileName = UUID.randomUUID().toString() + ".png";
+            fileName = UUID.randomUUID().toString() + ".jpg";
         }
         return new File(rootDir, fileName);
     }
