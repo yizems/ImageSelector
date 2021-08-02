@@ -83,4 +83,4 @@ class ImgPicker {
 
 typealias FailCallback = ((e: Exception?) -> Unit)
 
-typealias SuccessCallback = ((ret: PickerResult?) -> Unit)
+typealias SuccessCallback = ((ret: PickerResult) -> Unit)
