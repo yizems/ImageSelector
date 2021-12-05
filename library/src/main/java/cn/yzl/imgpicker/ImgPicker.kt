@@ -74,7 +74,7 @@ class ImgPicker {
 
         @JvmStatic
         var DEFAULT_OPTION: ImgPickerOption = ImgPickerOption()
-                .setCrop(true)
+                .setCrop(false)
                 .setFreeRatio(false)
                 .setRootDir(FileStorage.getDefultDir())
                 .setRatio(1, 1)
